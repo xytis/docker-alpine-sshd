@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Generate host keys if required
+ssh-keygen -A
+
+# Loop over all USER_xxx env vars, create user accounts as required and assign keys
+env | while IFS= read -r var
+do
+  name=${var%%=*}
+  case "$name" in
+    USER_*)
+      username=${name##USER_}
+      keys=${var##*=}
+      if [ "$username" ] && [ "$keys" ]; then
+        case "$keys" in
+          http*)
+            keys=$(curl -s $keys)
+          ;;
+        esac
+      fi
+      if ! id -u "$username" >/dev/null 2>&1; then
+        echo "Creating user $username..."
+        adduser -D -s /bin/ash $username
+        passwd -u $username >/dev/null 2>&1;
+        chown -R $username:$username /home/$username
+      fi
+      mkdir -p /home/$username/.ssh
+      echo $keys > /home/$username/.ssh/authorized_keys
+      ;;
+  esac
+done
+
+# Start SSH daemon
+exec /usr/sbin/sshd -D -e "$@"
