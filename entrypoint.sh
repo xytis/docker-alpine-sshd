@@ -3,6 +3,9 @@
 # Generate host keys if required
 ssh-keygen -A
 
+# Fallback to default SSHD config if none provided
+[ ! -f /etc/ssh/sshd_config ] && cp /sshd_config.orig /etc/ssh/sshd_config
+
 # Loop over all USER_xxx env vars, create user accounts as required and assign keys
 env | while IFS= read -r var
 do
@@ -31,4 +34,4 @@ do
 done
 
 # Start SSH daemon
-exec /usr/sbin/sshd -D -e "$@"
+exec /usr/sbin/sshd -D -e  "$@"
