@@ -28,7 +28,7 @@ do
         chown -R $username:$username /home/$username
       fi
       mkdir -p /home/$username/.ssh
-      echo $keys > /home/$username/.ssh/authorized_keys
+      echo "$keys" > /home/$username/.ssh/authorized_keys
       ;;
   esac
 done
