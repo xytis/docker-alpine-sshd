@@ -13,7 +13,7 @@ do
   case "$name" in
     USER_*)
       username=${name##USER_}
-      keys=${var##*=}
+      keys=${var#*=}
       if [ "$username" ] && [ "$keys" ]; then
         case "$keys" in
           http*)
